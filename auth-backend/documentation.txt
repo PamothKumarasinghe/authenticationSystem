@@ -1,0 +1,2 @@
+for now all teachers from different schools also can see every school.
+change it into the intructors can only see their selected schools students

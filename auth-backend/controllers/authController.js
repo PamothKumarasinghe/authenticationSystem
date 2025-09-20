@@ -6,36 +6,36 @@ import jwt from 'jsonwebtoken';
 // signup controller
 export const signup = async (req, res) => {
     try {
-    // get data from req.body
-    const { username, email, password } = req.body;
-    // validate that none are empty
-    if (!username || !email || !password) {
-        return res.status(400).json({message: "All fields are required"});
-    }
-    // check if user already exists
-    const [existing] = await db.query(
-        "SELECT * FROM users WHERE email = ? OR username = ?",
-        [email, username]
-    );
-    if (existing.length > 0) {
-        return res.status(400).json({message: "User already exists"});
-    }
-    // hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+        // get data from req.body
+        const { username, email, password } = req.body;
+        // validate that none are empty
+        if (!username || !email || !password) {
+            return res.status(400).json({message: "All fields are required"});
+        }
+        // check if user already exists
+        const [existing] = await db.query(
+            "SELECT * FROM teachers WHERE email = ? OR name = ?",
+            [email, username]
+        );
+        if (existing.length > 0) {
+            return res.status(400).json({message: "User already exists"});
+        }
+        // hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    // insert the new user into the database
-    const [result] = await db.query(
-        "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-        [username, email, hashedPassword]
-    );
-    
-    const token = jwt.sign(
-        { id: result.insertId, email: email },
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' }
-    );
+        // insert the new user into the database
+        const [result] = await db.query(
+            "INSERT INTO teachers (name, email, password) VALUES (?, ?, ?)",
+            [username, email, hashedPassword]
+        );
+        
+        const token = jwt.sign(
+            { id: result.insertId, email: email },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
-    res.status(201).json({message: "User created successfully", token});
+        res.status(201).json({message: "User created successfully", token});
     }
     catch (error) {
         console.error("Error during signup:", error);
@@ -56,7 +56,7 @@ export const login = async (req, res) => {
         if (!email || !password) return res.status(400).json({message: "All fields are required"});
 
         const [users] = await db.query (
-            "SELECT * FROM users WHERE email = ?",
+            "SELECT * FROM teachers WHERE email = ?",
             [email]
         );
         if (users.length === 0) return res.status(400).json({message: "Invalid credentials"});
